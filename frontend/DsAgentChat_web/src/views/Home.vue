@@ -8,6 +8,7 @@ import WelcomeHero from '../components/WelcomeHero.vue'
 import SearchResultPanel from '../components/SearchResultPanel.vue'
 import { useConversationStore } from '../stores/conversation'
 import { ApiService } from '../services/api'
+import { toLocalMsg } from '../utils/chatAdapter'
 import type { LocalMsg, SearchResult } from '../types'
 
 type Mode = 'standard' | 'reason' | 'search'
@@ -102,8 +103,18 @@ function onStop() {
   isStreaming.value = false
 }
 
-function onSelect(_id: number) {
-  /* Task 13 接入历史加载 */
+async function onSelect(id: number) {
+  if (isStreaming.value) isStreaming.value = false // 中断旧流式
+  try {
+    await convStore.loadConversationMessages(id)
+    messages.value = convStore.currentMessages.map(toLocalMsg)
+  } catch {
+    messages.value = []
+  }
+  searchPanelVisible.value = false
+  searchResults.value = []
+  mode.value = 'standard'
+  nextTick(() => chatRef.value?.scrollToBottom())
 }
 </script>
 
