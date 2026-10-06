@@ -40,8 +40,9 @@ async function onSend(text: string) {
   }
 
   messages.value.push({ role: 'user', content: text })
-  const assistant: LocalMsg = { role: 'assistant', content: '', reasoning: '' }
-  messages.value.push(assistant)
+  messages.value.push({ role: 'assistant', content: '', reasoning: '' })
+  // 取回响应式代理元素（而非原始对象），后续流式 mutate 才能触发重渲染
+  const assistant = messages.value[messages.value.length - 1]
   isStreaming.value = true
 
   try {
