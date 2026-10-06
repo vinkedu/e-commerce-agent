@@ -1,0 +1,23 @@
+frontend/DsAgentChat_web/src/views/Home.vue
+  s_32ee097ba0c6dd::t_27e56b3be06fab 48-63
+  s_32ee097ba0c6dd::t_46b8d298fd2360 8,11,20-21
+  s_32ee097ba0c6dd::t_1c22d82e7dc6eb 73-100
+  s_32ee097ba0c6dd::t_1376e0fe24019c 150-154
+  s_32ee097ba0c6dd::t_ebbd1528e7d235 124-134,145
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e963bc0b4a88fdb6ec70641ed687ba3f203aa224",
+  "prompts": {},
+  "sessions": {
+    "s_32ee097ba0c6dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf6b6262-3154-4ce0-a15a-c4f22faffdc0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "kaiwen_du <kaiwen_du@intsig.net>"
+    }
+  }
+}
