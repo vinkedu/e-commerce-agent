@@ -1,0 +1,25 @@
+frontend/DsAgentChat_web/src/services/api.ts
+  s_32ee097ba0c6dd::t_971a02d085de0a 48-66
+  s_32ee097ba0c6dd::t_e40aed29fc5c46 225,230
+  s_32ee097ba0c6dd::t_e4be04c5eea698 252,257
+  s_32ee097ba0c6dd::t_f9f338459223bd 273
+  s_32ee097ba0c6dd::t_4c1df894b8ba28 283,290
+  s_32ee097ba0c6dd::t_1aa71635e237be 198,203
+  s_32ee097ba0c6dd::t_95836d4bcd4be4 163,171,175
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "58e8d8ace33fb2129ed3963a57b00a5722203a13",
+  "prompts": {},
+  "sessions": {
+    "s_32ee097ba0c6dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf6b6262-3154-4ce0-a15a-c4f22faffdc0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "kaiwen_du <kaiwen_du@intsig.net>"
+    }
+  }
+}
