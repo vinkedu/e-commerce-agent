@@ -1300,12 +1300,16 @@ onMounted(() => {
 
 .chat-popup-messages {
   flex: 1;
-  overflow-y: auto;
-  padding: 15px;
-  background-color: #f8f8f8;
+  min-height: 0;
+  overflow: hidden;
+  background-color: var(--td-bg-color-page);
   display: flex;
   flex-direction: column;
-  gap: 15px;
+}
+.popup-chat {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
 }
 
 .popup-message {
