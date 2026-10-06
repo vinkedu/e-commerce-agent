@@ -1,0 +1,23 @@
+frontend/DsAgentChat_web/src/views/EcommerceService.vue
+  s_32ee097ba0c6dd::t_cf59a2b581b519 243,245
+  s_32ee097ba0c6dd::t_c821fc2b119583 382-383,387,391,397
+  s_32ee097ba0c6dd::t_f560b1a73d9fd3 560-561,569,575
+  s_32ee097ba0c6dd::t_b5d9e12f71164e 499-515
+  s_32ee097ba0c6dd::t_bdb3d4cef39db1 176
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9383fcace259ea9e49c95173f81b4ebd02d0c6c3",
+  "prompts": {},
+  "sessions": {
+    "s_32ee097ba0c6dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf6b6262-3154-4ce0-a15a-c4f22faffdc0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "kaiwen_du <kaiwen_du@intsig.net>"
+    }
+  }
+}
