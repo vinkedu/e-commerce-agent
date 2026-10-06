@@ -1,0 +1,22 @@
+frontend/DsAgentChat_web/src/components/ChatView.vue
+  s_32ee097ba0c6dd::t_f05ab5c6b293a7 36-41
+  s_32ee097ba0c6dd::t_47fb4d0cf586ba 23,32-33
+frontend/DsAgentChat_web/src/utils/chatAdapter.ts
+  s_32ee097ba0c6dd::t_53a9b7e25cdd3a 27-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5c969ff9cdf9538353b26cd0aaaff19c6f0e3df6",
+  "prompts": {},
+  "sessions": {
+    "s_32ee097ba0c6dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf6b6262-3154-4ce0-a15a-c4f22faffdc0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "kaiwen_du <kaiwen_du@intsig.net>"
+    }
+  }
+}
