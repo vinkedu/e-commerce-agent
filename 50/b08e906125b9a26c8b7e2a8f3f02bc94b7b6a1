@@ -1,0 +1,25 @@
+frontend/DsAgentChat_web/src/views/Home.vue
+  s_32ee097ba0c6dd::t_d9ffdaff761e7d 2-7,9-10,12,14-18,21,24-26,29-31,33-35,38-41,44-46,48-50,52-57,61-62,65-66
+  s_32ee097ba0c6dd::t_a80e0692cab2ea 70-96,99-101,105
+frontend/DsAgentChat_web/src/router/index.ts
+  s_32ee097ba0c6dd::t_21854bc395d56c 40
+frontend/DsAgentChat_web/src/components/RichChatInput.vue
+  s_32ee097ba0c6dd::t_c425ac93fec228 3
+  s_32ee097ba0c6dd::t_87543ccc363482 30-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "50b08e906125b9a26c8b7e2a8f3f02bc94b7b6a1",
+  "prompts": {},
+  "sessions": {
+    "s_32ee097ba0c6dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf6b6262-3154-4ce0-a15a-c4f22faffdc0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "kaiwen_du <kaiwen_du@intsig.net>"
+    }
+  }
+}
