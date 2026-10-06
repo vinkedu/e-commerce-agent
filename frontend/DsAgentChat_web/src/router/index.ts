@@ -26,12 +26,6 @@ const router = createRouter({
       path: '/ecommerce',
       name: 'ecommerce',
       component: EcommerceService
-    },
-    {
-      // 临时冒烟路由，Task 1 验证 TDesign Chat 后删除
-      path: '/smoke',
-      name: 'smoke',
-      component: () => import('../views/_SmokeChat.vue')
     }
   ]
 })
@@ -47,7 +41,7 @@ router.beforeEach((to, _from, next) => {
   }
   
   // 如果未登录用户访问需要认证的页面，跳转到登录页
-  if (!token && to.path !== '/login' && to.path !== '/register' && to.path !== '/smoke') {
+  if (!token && to.path !== '/login' && to.path !== '/register') {
     next('/login')
     return
   }
