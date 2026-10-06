@@ -42,7 +42,11 @@ async function onSend(text: string) {
 
   try {
     const payload = [{ role: 'user' as const, content: text }]
-    const reader = await ApiService.chat(payload, convId)
+    const reader =
+      mode.value === 'reason'
+        ? await ApiService.reason(payload, convId)
+        : await ApiService.chat(payload, convId)
+    // search 分支在 Task 12 接入
     if (!reader) throw new Error('no reader')
     await ApiService.handleChatStream(reader, (chunk) => {
       if (chunk.type === 'think') assistant.reasoning = chunk.content
