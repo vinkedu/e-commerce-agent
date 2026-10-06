@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { DropdownOption } from 'tdesign-vue-next'
 
 type Mode = 'standard' | 'reason' | 'search'
 const props = defineProps<{ loading: boolean; mode: Mode }>()
@@ -26,8 +27,8 @@ function onSend(value: string) {
 function onStop() {
   emit('stop')
 }
-function pickMode(data: { value: string | number }) {
-  emit('update:mode', data.value as Mode)
+function pickMode(data: DropdownOption) {
+  if (typeof data.value === 'string') emit('update:mode', data.value as Mode)
 }
 </script>
 
