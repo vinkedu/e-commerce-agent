@@ -20,6 +20,7 @@ defineExpose({ scrollToBottom })
     ref="chatRef"
     :data="chatItems"
     layout="single"
+    :clear-history="false"
     :is-stream-load="isStreaming"
     :auto-scroll="true"
     class="chat-view"
@@ -28,7 +29,14 @@ defineExpose({ scrollToBottom })
 
 <style scoped>
 .chat-view {
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   width: 100%;
+}
+/* 消息内容居中成一列（与底部输入框同宽），滚动条仍在右缘 */
+.chat-view :deep(.t-chat__list) > * {
+  max-width: 820px;
+  margin-left: auto;
+  margin-right: auto;
 }
 </style>

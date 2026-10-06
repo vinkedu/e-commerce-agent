@@ -24,12 +24,18 @@ export function toChatItems(msgs: LocalMsg[]): TdChatItemMeta[] {
     if (m.reasoning) {
       content.push({ type: 'thinking', data: { title: '思考过程', text: m.reasoning } })
     }
-    content.push({ type: 'markdown', data: m.content })
+    // 错误态用「内容块级」status（item 级 status 会触发 chat-list 的优先级 bug，
+    // 任何真值 item.status 都被判成 'pending' → 整条渲染成骨架条）。
+    content.push({
+      type: 'markdown',
+      data: m.content,
+      status: m.status === 'error' ? 'error' : undefined,
+    })
+    // 注意：不设 item 级 status，否则 completed 消息也会被当 pending 显示骨架。
     return {
       role: 'assistant',
       name: 'AssistGen 助手',
       content,
-      status: m.status === 'error' ? 'error' : 'complete',
     }
   })
 }
