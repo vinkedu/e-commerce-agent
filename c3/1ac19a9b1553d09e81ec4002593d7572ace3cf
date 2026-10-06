@@ -1,0 +1,21 @@
+frontend/DsAgentChat_web/src/components/ConversationSidebar.vue
+  s_32ee097ba0c6dd::t_dc64e60f1cad47 42-75
+  s_32ee097ba0c6dd::t_93ad99d50789c3 1-41
+  s_32ee097ba0c6dd::t_1047607218af42 76-146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c31ac19a9b1553d09e81ec4002593d7572ace3cf",
+  "prompts": {},
+  "sessions": {
+    "s_32ee097ba0c6dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf6b6262-3154-4ce0-a15a-c4f22faffdc0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "kaiwen_du <kaiwen_du@intsig.net>"
+    }
+  }
+}
