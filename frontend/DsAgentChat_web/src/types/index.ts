@@ -19,4 +19,12 @@ export interface SearchResult {
   date?: string
   source?: string
   isExpanded?: boolean
+}
+
+// 本地渲染/流式写入的消息模型（Home 的唯一实时数据源）
+export interface LocalMsg {
+  role: 'user' | 'assistant'
+  content: string
+  reasoning?: string
+  status?: '' | 'error'
 } 

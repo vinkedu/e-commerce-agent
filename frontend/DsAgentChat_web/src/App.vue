@@ -7,7 +7,8 @@
 
 <style>
 #app {
-  font-family: Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Microsoft YaHei', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -21,14 +22,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #1e1e1e;
+  background: var(--td-bg-color-page, #f3f5f7);
 }
 
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid #333;
-  border-top-color: #4b4bff;
+  border: 3px solid var(--td-brand-color-2, #c4f0d3);
+  border-top-color: var(--td-brand-color, #07a452);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

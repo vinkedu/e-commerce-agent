@@ -1,0 +1,36 @@
+/**
+ * theme-accio.css —— Accio 风格浅色 + 绿色品牌主题
+ * 必须在 TDesign 样式之后引入（见 main.ts 的 import 顺序）。
+ * 只覆盖 CSS 变量，不改组件实现。
+ */
+:root {
+  /* 品牌色阶：蓝 → 绿（Accio 主色系） */
+  --td-brand-color-1: #e3f9eb;
+  --td-brand-color-2: #c4f0d3;
+  --td-brand-color-3: #93e3b0;
+  --td-brand-color-4: #5fd38b;
+  --td-brand-color-5: #34c171;
+  --td-brand-color-6: #16b162;
+  --td-brand-color-7: #07a452;
+  --td-brand-color-8: #059148;
+  --td-brand-color-9: #047a3d;
+  --td-brand-color-10: #036330;
+
+  --td-brand-color: var(--td-brand-color-7);
+  --td-brand-color-hover: var(--td-brand-color-6);
+  --td-brand-color-active: var(--td-brand-color-8);
+  --td-brand-color-focus: var(--td-brand-color-2);
+  --td-brand-color-disabled: var(--td-brand-color-3);
+  --td-brand-color-light: var(--td-brand-color-1);
+  --td-brand-color-light-hover: var(--td-brand-color-2);
+}
+
+/* 强制浅色底，覆盖历史深色样式 */
+html,
+body,
+#app {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--td-bg-color-page, #f3f5f7);
+  color: var(--td-text-color-primary, rgba(0, 0, 0, 0.9));
+}
