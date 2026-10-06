@@ -173,16 +173,7 @@
         <button class="close-btn" @click="showChatPopup = false">×</button>
       </div>
       <div class="chat-popup-messages" ref="messagesContainer">
-        <div v-for="(message, index) in messages" 
-             :key="index"
-             :class="['popup-message', message.role === 'user' ? 'popup-user-message' : 'popup-assistant-message']">
-          <!-- 如果有图片，显示图片 -->
-          <div v-if="message.imageUrl" class="message-image">
-            <img :src="message.imageUrl" alt="用户上传图片" />
-          </div>
-          <!-- 显示文本内容 -->
-          <div class="popup-message-content" v-html="renderMessage(message.content)"></div>
-        </div>
+        <t-chat :data="chatData" layout="single" :clear-history="false" class="popup-chat" />
       </div>
       <div class="chat-popup-input">
         <input 
@@ -249,9 +240,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import MarkdownIt from 'markdown-it'
+import type { TdChatItemMeta, AIMessageContent } from '@tdesign-vue-next/chat'
 
 const router = useRouter()
 const messagesContainer = ref<HTMLElement | null>(null)
@@ -388,22 +379,22 @@ const sendMessage = async () => {
       formData.append('conversation_id', conversationId.value)
     }
     
-    // 调用API
-    const response = await fetch('http://localhost:8000/api/langgraph/query', {
+    // 调用API（相对路径，走 vite 代理 + 生产同源）
+    const response = await fetch('/api/langgraph/query', {
       method: 'POST',
       body: formData
     })
-    
+
     if (!response.ok) {
       throw new Error(`请求失败: ${response.status}`)
     }
-    
+
     // 存储返回的会话ID（如果有）
     const returnedConversationId = response.headers.get('X-Conversation-ID')
     if (returnedConversationId) {
       conversationId.value = returnedConversationId
     }
-    
+
     // 移除加载消息
     const loadingMsgIndex = messages.value.findIndex(msg => msg.isLoading)
     if (loadingMsgIndex !== -1) {
@@ -505,19 +496,23 @@ const handleChatStream = async (reader: ReadableStreamDefaultReader<Uint8Array>)
   }
 }
 
-// 渲染消息内容
-const renderMessage = (content: string) => {
-  // 使用无空行的Markdown配置
-  const customMd = new MarkdownIt({
-    breaks: true,
-    html: false,
-    linkify: true,
-  })
-  
-  // 处理段落标签，去掉额外空白
-  const html = customMd.render(content)
-  return html.replace(/<p>(.*?)<\/p>/g, '$1').replace(/<br><br>/g, '<br>')
-}
+// 本地消息 → TDesign Chat 块数组（替代 v-html + markdown-it，消除 XSS）
+const chatData = computed<TdChatItemMeta[]>(() =>
+  messages.value.map((m): TdChatItemMeta => {
+    const content: AIMessageContent[] = []
+    if (m.imageUrl) {
+      content.push({ type: 'image', data: { url: m.imageUrl } })
+    }
+    if (m.content) {
+      content.push({ type: 'markdown', data: m.content })
+    }
+    return {
+      role: m.role,
+      name: m.role === 'user' ? '我' : '智能客服',
+      content,
+    }
+  }),
+)
 
 // 滚动到底部
 const scrollToBottom = () => {
@@ -562,8 +557,8 @@ const handleImageUpload = async (event: Event) => {
       formData.append('conversation_id', conversationId.value)
     }
 
-    // 调用API
-    const response = await fetch('http://localhost:8000/api/langgraph/query', {
+    // 调用API（相对路径，走 vite 代理 + 生产同源）
+    const response = await fetch('/api/langgraph/query', {
       method: 'POST',
       body: formData
     })
@@ -571,13 +566,13 @@ const handleImageUpload = async (event: Event) => {
     if (!response.ok) {
       throw new Error(`请求失败: ${response.status}`)
     }
-    
+
     // 存储返回的会话ID（如果有）
     const returnedConversationId = response.headers.get('X-Conversation-ID')
     if (returnedConversationId) {
       conversationId.value = returnedConversationId
     }
-    
+
     // 更新消息状态
     const loadingMsgIndex = messages.value.findIndex(msg => msg.isLoading)
     if (loadingMsgIndex !== -1) {
