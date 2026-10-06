@@ -141,21 +141,33 @@ app.mount('#app')
 ## 4. 数据流与状态
 
 ### 4.1 消息数据模型适配（关键集成点）
-TDesign Chat 的 `<t-chat>` 吃 `data: TdChatItemMeta[]`：
+> ✅ **已装包核对（Task 1，权威来源 `@tdesign/ai-chat-engine/dist/index.d.mts` + `@tdesign-vue-next/chat/es/type.d.ts`）**：content **确为内容块数组 `{type,data}`，不是字符串**；`TdChatItemMeta` **没有 `reasoning` 字段**（之前设计有误）。
+
+TDesign Chat 的 `<t-chat>` 吃 `data: TdChatItemMeta[]`（真实签名）：
 ```ts
 interface TdChatItemMeta {
   avatar?: string
   name?: string
-  role?: 'user' | 'assistant' | 'error' | 'system' | 'model-change'
+  role?: ChatMessageRole                               // 'user' | 'assistant' | 'system'
   datetime?: string
-  content?: AIMessageContent[] | UserMessageContent[]  // 内容块数组
-  status?: ChatMessageStatus
-  reasoning?: boolean | TdChatReasoning                 // 思维链
+  content?: AIMessageContent[] | UserMessageContent[]  // 内容块数组（无字符串重载）
+  status?: ChatMessageStatus                           // 'pending'|'streaming'|'complete'|'stop'|'error'
 }
 ```
-现有 Home 的消息是 `{ role, content: string, thinking?: string }`。需要一个**适配函数** `toChatItems(messages): TdChatItemMeta[]`，把本地消息映射成 TDesign 格式。
+内容块（`ChatBaseContent<T, TData> = { type: T; data: TData; status?; id?; strategy?; ext? }`）：
+```ts
+type TextContent     = { type: 'text';     data: string }
+type MarkdownContent = { type: 'markdown'; data: string }
+type ThinkingContent = { type: 'thinking'; data: { text?: string; title?: string } }
+type SearchContent   = { type: 'search';   data: { title?: string; references?: ReferenceItem[] } }
+// ReferenceItem = { title; url?; content?; site?; icon?; type?; date? }
+```
+现有 Home 的消息是 `{ role, content: string, thinking?: string }`。需要**适配函数** `toChatItems(messages): TdChatItemMeta[]`，把本地消息映射成 TDesign 块数组格式：
+- 用户消息 → `content: [{ type:'text', data: m.content }]`
+- 助手消息 → `content: [ ...(reasoning ? [{type:'thinking', data:{text: reasoning}}] : []), { type:'markdown', data: m.content } ]`
+- `status` 用 `'error'` 标错误态；流式途中可用 `'streaming'`。
 
-> ⚠️ 实现期必须现场核对：`AIMessageContent`/`UserMessageContent` 的精确结构来自 `@tdesign/web-components-chat`，装包后查其 `.d.ts` 确认 content 块是 `{type,data}` 还是字符串。设计以「单文本块」为基线，装包后校正。
+> 影响：Task 2 适配器按上述块数组实现（**非**字符串直填、**非** `reasoning: true` 布尔）。思维链不再走 `reasoning` slot，改由 `thinking` 内容块原生渲染（见 §4.4）。
 
 ### 4.1.1 本地 messages 与 store.currentMessages 的分工（定死）
 - Home 持有本地 `messages = ref<LocalMsg[]>`，**作为渲染与流式写入的唯一数据源**（流式逐字追加需高频 mutate，走本地 ref 最直接）。
@@ -196,7 +208,9 @@ sendMessage(text):
 现有 `isDeepThinking` + `isSearching` 两个互斥布尔 → 收敛成单一 `mode = ref<'standard'|'reason'|'search'>('standard')`，由「标准∨」下拉驱动。消除两布尔互斥的隐患。
 
 ### 4.4 思维链渲染
-深度推理模式：`chunk.type==='think'` 的内容写进消息的 reasoning，由 `<t-chat>` 的 `reasoning` slot 渲染成 `<t-chat-reasoning>` 折叠面板。**删除**原来的 `### 思考过程 + ---` 字符串拼接 hack 和 `renderMessage` 的 split 解析。
+> ✅ 已核对：`<t-chat>` 的 `reasoning` 是**自定义渲染函数(TNode)**，不是布尔开关；思维链的原生渲染靠 **`thinking` 内容块**（`{type:'thinking', data:{text}}`），由 `<t-chat>` 默认内容渲染成折叠面板。
+
+深度推理模式：`chunk.type==='think'` 的内容写进本地消息的 `reasoning` 字段，适配器把它转成助手消息 content 数组里的 `thinking` 块（排在 `markdown` 块之前）。**删除**原来的 `### 思考过程 + ---` 字符串拼接 hack 和 `renderMessage` 的 split 解析。
 
 ### 4.5 联网搜索
 `handleSearch` 解析 JSON 事件（`search_start`/`search_results`/`direct_content`）的逻辑保留，但：

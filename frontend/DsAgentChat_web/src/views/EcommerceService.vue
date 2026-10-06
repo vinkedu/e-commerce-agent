@@ -173,16 +173,7 @@
         <button class="close-btn" @click="showChatPopup = false">×</button>
       </div>
       <div class="chat-popup-messages" ref="messagesContainer">
-        <div v-for="(message, index) in messages" 
-             :key="index"
-             :class="['popup-message', message.role === 'user' ? 'popup-user-message' : 'popup-assistant-message']">
-          <!-- 如果有图片，显示图片 -->
-          <div v-if="message.imageUrl" class="message-image">
-            <img :src="message.imageUrl" alt="用户上传图片" />
-          </div>
-          <!-- 显示文本内容 -->
-          <div class="popup-message-content" v-html="renderMessage(message.content)"></div>
-        </div>
+        <t-chat :data="chatData" layout="single" :clear-history="false" class="popup-chat" />
       </div>
       <div class="chat-popup-input">
         <input 
@@ -249,13 +240,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import MarkdownIt from 'markdown-it'
-import axios from 'axios'
+import type { TdChatItemMeta, AIMessageContent } from '@tdesign-vue-next/chat'
 
 const router = useRouter()
-const md = new MarkdownIt()
 const messagesContainer = ref<HTMLElement | null>(null)
 const userInput = ref('')
 const searchInput = ref('')
@@ -390,22 +379,22 @@ const sendMessage = async () => {
       formData.append('conversation_id', conversationId.value)
     }
     
-    // 调用API
-    const response = await fetch('http://localhost:8000/api/langgraph/query', {
+    // 调用API（相对路径，走 vite 代理 + 生产同源）
+    const response = await fetch('/api/langgraph/query', {
       method: 'POST',
       body: formData
     })
-    
+
     if (!response.ok) {
       throw new Error(`请求失败: ${response.status}`)
     }
-    
+
     // 存储返回的会话ID（如果有）
     const returnedConversationId = response.headers.get('X-Conversation-ID')
     if (returnedConversationId) {
       conversationId.value = returnedConversationId
     }
-    
+
     // 移除加载消息
     const loadingMsgIndex = messages.value.findIndex(msg => msg.isLoading)
     if (loadingMsgIndex !== -1) {
@@ -507,19 +496,23 @@ const handleChatStream = async (reader: ReadableStreamDefaultReader<Uint8Array>)
   }
 }
 
-// 渲染消息内容
-const renderMessage = (content: string) => {
-  // 使用无空行的Markdown配置
-  const customMd = new MarkdownIt({
-    breaks: true,
-    html: false,
-    linkify: true,
-  })
-  
-  // 处理段落标签，去掉额外空白
-  const html = customMd.render(content)
-  return html.replace(/<p>(.*?)<\/p>/g, '$1').replace(/<br><br>/g, '<br>')
-}
+// 本地消息 → TDesign Chat 块数组（替代 v-html + markdown-it，消除 XSS）
+const chatData = computed<TdChatItemMeta[]>(() =>
+  messages.value.map((m): TdChatItemMeta => {
+    const content: AIMessageContent[] = []
+    if (m.imageUrl) {
+      content.push({ type: 'image', data: { url: m.imageUrl } })
+    }
+    if (m.content) {
+      content.push({ type: 'markdown', data: m.content })
+    }
+    return {
+      role: m.role,
+      name: m.role === 'user' ? '我' : '智能客服',
+      content,
+    }
+  }),
+)
 
 // 滚动到底部
 const scrollToBottom = () => {
@@ -564,8 +557,8 @@ const handleImageUpload = async (event: Event) => {
       formData.append('conversation_id', conversationId.value)
     }
 
-    // 调用API
-    const response = await fetch('http://localhost:8000/api/langgraph/query', {
+    // 调用API（相对路径，走 vite 代理 + 生产同源）
+    const response = await fetch('/api/langgraph/query', {
       method: 'POST',
       body: formData
     })
@@ -573,13 +566,13 @@ const handleImageUpload = async (event: Event) => {
     if (!response.ok) {
       throw new Error(`请求失败: ${response.status}`)
     }
-    
+
     // 存储返回的会话ID（如果有）
     const returnedConversationId = response.headers.get('X-Conversation-ID')
     if (returnedConversationId) {
       conversationId.value = returnedConversationId
     }
-    
+
     // 更新消息状态
     const loadingMsgIndex = messages.value.findIndex(msg => msg.isLoading)
     if (loadingMsgIndex !== -1) {
@@ -687,7 +680,7 @@ onMounted(() => {
 }
 
 .login-info a {
-  color: #ff4d4f;
+  color: #07a452;
   margin: 0 5px;
   text-decoration: none;
 }
@@ -703,11 +696,11 @@ onMounted(() => {
 }
 
 .top-nav a:hover {
-  color: #ff4d4f;
+  color: #07a452;
 }
 
 .badge {
-  background-color: #ff4d4f;
+  background-color: #07a452;
   color: white;
   border-radius: 50%;
   font-size: 10px;
@@ -737,7 +730,7 @@ onMounted(() => {
 .logo-box {
   width: 120px;
   height: 40px;
-  background-color: #ff4d4f;
+  background-color: #07a452;
   color: white;
   font-size: 24px;
   font-weight: bold;
@@ -759,7 +752,7 @@ onMounted(() => {
   flex: 1;
   height: 100%;
   padding: 0 15px;
-  border: 2px solid #ff4d4f;
+  border: 2px solid #07a452;
   border-right: none;
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
@@ -770,7 +763,7 @@ onMounted(() => {
 .search-btn {
   width: 80px;
   height: 100%;
-  background-color: #ff4d4f;
+  background-color: #07a452;
   color: white;
   border: none;
   border-top-right-radius: 20px;
@@ -799,7 +792,7 @@ onMounted(() => {
   position: absolute;
   top: -5px;
   right: -5px;
-  background-color: #ff4d4f;
+  background-color: #07a452;
   color: white;
   font-size: 10px;
   width: 15px;
@@ -811,7 +804,7 @@ onMounted(() => {
 }
 
 .nav-wrapper {
-  background-color: #ff4d4f;
+  background-color: #07a452;
   width: 100%;
 }
 
@@ -831,7 +824,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #d23c3e;
+  background-color: #059148;
   color: white;
   font-weight: bold;
   font-size: 14px;
@@ -897,7 +890,7 @@ onMounted(() => {
 
 .category-list li:hover {
   background-color: #f5f5f5;
-  color: #ff4d4f;
+  color: #07a452;
 }
 
 .icon {
@@ -920,7 +913,7 @@ onMounted(() => {
 .main-banner {
   width: 100%;
   height: 300px;
-  background: linear-gradient(135deg, #ffeeee 0%, #ddefbb 100%);
+  background: linear-gradient(135deg, #e3f9eb 0%, #ddefbb 100%);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -1074,14 +1067,14 @@ onMounted(() => {
 .product-price {
   font-size: 18px;
   font-weight: bold;
-  color: #ff4d4f;
+  color: #07a452;
   margin-bottom: 10px;
 }
 
 .add-to-cart-btn {
   width: 100%;
   height: 36px;
-  background-color: #ff4d4f;
+  background-color: #07a452;
   color: #fff;
   border: none;
   border-radius: 18px;
@@ -1090,7 +1083,7 @@ onMounted(() => {
 }
 
 .add-to-cart-btn:hover {
-  background-color: #ff7875;
+  background-color: #16b162;
 }
 
 /* 热销商品区域样式 */
@@ -1209,14 +1202,14 @@ onMounted(() => {
 .product-price {
   font-size: 18px;
   font-weight: bold;
-  color: #ff4d4f;
+  color: #07a452;
   margin-bottom: 10px;
 }
 
 .add-to-cart-btn {
   width: 100%;
   height: 36px;
-  background-color: #ff4d4f;
+  background-color: #07a452;
   color: #fff;
   border: none;
   border-radius: 18px;
@@ -1225,7 +1218,7 @@ onMounted(() => {
 }
 
 .add-to-cart-btn:hover {
-  background-color: #ff7875;
+  background-color: #16b162;
 }
 
 /* 客服浮动按钮样式 */
@@ -1233,7 +1226,7 @@ onMounted(() => {
   position: fixed;
   bottom: 30px;
   right: 30px;
-  background-color: #ff4d4f;
+  background-color: #07a452;
   color: white;
   border-radius: 50px;
   padding: 15px 20px;
@@ -1278,7 +1271,7 @@ onMounted(() => {
 }
 
 .chat-popup-header {
-  background-color: #ff4d4f;
+  background-color: #07a452;
   padding: 15px 20px;
   display: flex;
   justify-content: space-between;
@@ -1307,12 +1300,16 @@ onMounted(() => {
 
 .chat-popup-messages {
   flex: 1;
-  overflow-y: auto;
-  padding: 15px;
-  background-color: #f8f8f8;
+  min-height: 0;
+  overflow: hidden;
+  background-color: var(--td-bg-color-page);
   display: flex;
   flex-direction: column;
-  gap: 15px;
+}
+.popup-chat {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
 }
 
 .popup-message {
@@ -1325,7 +1322,7 @@ onMounted(() => {
 
 .popup-user-message {
   align-self: flex-end;
-  background-color: #ff4d4f;
+  background-color: #07a452;
   color: white;
   border-bottom-right-radius: 4px;
 }
@@ -1379,7 +1376,7 @@ onMounted(() => {
 }
 
 .chat-popup-input input:focus {
-  border-color: #ff4d4f;
+  border-color: #07a452;
 }
 
 .chat-popup-input .upload-btn {
@@ -1409,7 +1406,7 @@ onMounted(() => {
 .chat-popup-input .send-btn {
   width: 70px;
   height: 40px;
-  background-color: #ff4d4f;
+  background-color: #07a452;
   color: white;
   border: none;
   border-radius: 20px;
@@ -1455,7 +1452,7 @@ onMounted(() => {
 }
 
 .link-group a:hover {
-  color: #ff4d4f;
+  color: #07a452;
 }
 
 .copyright {
@@ -1551,6 +1548,6 @@ onMounted(() => {
 }
 
 .links-list a:hover {
-  color: #ff4d4f;
+  color: #07a452;
 }
 </style> 

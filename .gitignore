@@ -58,3 +58,6 @@ backend/deepseek_agent/llm_backend/app/graphrag/origin_data/
 *.swo
 .DS_Store
 Thumbs.db
+
+# Superpowers scratch
+.superpowers/

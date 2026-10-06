@@ -45,6 +45,25 @@ export interface Message {
 export class ApiService {
   private static baseUrl = import.meta.env.VITE_API_BASE_URL
 
+  // user_id 缺失时清 token 并跳登录页，避免发出无效请求
+  private static requireUserId(): string {
+    const id = localStorage.getItem('user_id')
+    if (!id) {
+      localStorage.removeItem('token')
+      router.push('/login')
+      throw new Error('No user_id')
+    }
+    return id
+  }
+
+  // 响应 401 时清 token 并跳登录页
+  private static checkAuth(response: Response): void {
+    if (response.status === 401) {
+      localStorage.removeItem('token')
+      router.push('/login')
+    }
+  }
+
   // 处理聊天消息流
   static async handleChatStream(reader: ReadableStreamDefaultReader<Uint8Array>, 
                               onChunk: (chunk: StreamChunk) => void) {
@@ -141,6 +160,7 @@ export class ApiService {
 
   // 创建新会话
   static async createConversation(): Promise<number> {
+    const userId = this.requireUserId()
     const response = await fetch(`${this.baseUrl}/api/conversations`, {
       method: 'POST',
       headers: {
@@ -148,10 +168,11 @@ export class ApiService {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
       body: JSON.stringify({
-        user_id: localStorage.getItem('user_id')
+        user_id: userId
       })
     })
 
+    this.checkAuth(response)
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
@@ -174,11 +195,12 @@ export class ApiService {
       },
       body: JSON.stringify({
         messages,
-        user_id: localStorage.getItem('user_id'),
+        user_id: this.requireUserId(),
         conversation_id: conversationId
       })
     })
 
+    this.checkAuth(response)
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
@@ -200,11 +222,12 @@ export class ApiService {
       },
       body: JSON.stringify({
         messages,
-        user_id: localStorage.getItem('user_id'),
+        user_id: this.requireUserId(),
         conversation_id: conversationId
       })
     })
 
+    this.checkAuth(response)
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
@@ -226,11 +249,12 @@ export class ApiService {
       },
       body: JSON.stringify({
         messages,
-        user_id: localStorage.getItem('user_id'),
+        user_id: this.requireUserId(),
         conversation_id: conversationId
       })
     })
 
+    this.checkAuth(response)
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
@@ -246,6 +270,7 @@ export class ApiService {
       }
     })
 
+    this.checkAuth(response)
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
@@ -255,13 +280,14 @@ export class ApiService {
 
   // 获取特定会话的所有消息
   static async getConversationMessages(conversationId: number): Promise<Message[]> {
-    const userId = localStorage.getItem('user_id')
+    const userId = this.requireUserId()
     const response = await fetch(`${this.baseUrl}/api/conversations/${conversationId}/messages?user_id=${userId}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
     })
 
+    this.checkAuth(response)
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
