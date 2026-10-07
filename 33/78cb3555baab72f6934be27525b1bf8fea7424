@@ -1,0 +1,25 @@
+docs/superpowers/specs/2026-10-07-agent-loop-kernel-upgrade-design.md
+  s_32ee097ba0c6dd::t_3d1f7f4d0eea24 125-126
+  s_32ee097ba0c6dd::t_2ab5280a9ca968 140-197,199-215
+  s_32ee097ba0c6dd::t_9083933b9416c6 198
+  s_32ee097ba0c6dd::t_d73ea9ef26c79c 32-69
+  s_32ee097ba0c6dd::t_b8060619088a64 113-124,127-139
+  s_32ee097ba0c6dd::t_b763c0f3dc098f 70-112
+  s_32ee097ba0c6dd::t_958fcbff45a777 1-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3378cb3555baab72f6934be27525b1bf8fea7424",
+  "prompts": {},
+  "sessions": {
+    "s_32ee097ba0c6dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf6b6262-3154-4ce0-a15a-c4f22faffdc0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "kaiwen_du <kaiwen_du@intsig.net>"
+    }
+  }
+}
