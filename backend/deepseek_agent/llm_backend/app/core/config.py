@@ -31,7 +31,11 @@ class Settings(BaseSettings):
     CHAT_SERVICE: ServiceType = ServiceType.DEEPSEEK
     REASON_SERVICE: ServiceType = ServiceType.OLLAMA
     AGENT_SERVICE: ServiceType = ServiceType.DEEPSEEK
-    
+
+    # Agent loop settings
+    LG_AGENT_MODE: str = "legacy"   # loop | legacy
+    SQLITE_CHECKPOINT_PATH: str = "checkpoints.sqlite"
+
     # Search settings
     SERPAPI_KEY: str
     SEARCH_RESULT_COUNT: int = 3
