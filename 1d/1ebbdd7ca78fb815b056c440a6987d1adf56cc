@@ -1,0 +1,30 @@
+docs/superpowers/plans/2026-10-07-agent-loop-kernel-upgrade.md
+  s_32ee097ba0c6dd::t_ccfa9e1bf34b4f 1-64
+  s_32ee097ba0c6dd::t_91b36fd08fa8d5 796-881,939-941
+  s_32ee097ba0c6dd::t_169328092b7014 993-1152
+  s_32ee097ba0c6dd::t_d4f264875fc894 409-494
+  s_32ee097ba0c6dd::t_a68807602d29a5 65-186,1330,1427
+  s_32ee097ba0c6dd::t_0e8d2bced1eb25 187-408
+  s_32ee097ba0c6dd::t_4310c3ecd8cadc 882-938
+  s_32ee097ba0c6dd::t_0985ddc80afdc4 942-992
+  s_32ee097ba0c6dd::t_31f298495c1c5c 1153-1328
+  s_32ee097ba0c6dd::t_ffb5a5e301772d 652-795
+  s_32ee097ba0c6dd::t_29949fe0acbf15 495-651
+  s_32ee097ba0c6dd::t_c44b81bc39da7c 1329,1331-1426,1428-1451
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1d1ebbdd7ca78fb815b056c440a6987d1adf56cc",
+  "prompts": {},
+  "sessions": {
+    "s_32ee097ba0c6dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf6b6262-3154-4ce0-a15a-c4f22faffdc0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "kaiwen_du <kaiwen_du@intsig.net>"
+    }
+  }
+}
