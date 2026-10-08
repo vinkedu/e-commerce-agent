@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     # Agent loop settings
     LG_AGENT_MODE: str = "legacy"   # loop | legacy
     SQLITE_CHECKPOINT_PATH: str = "checkpoints.sqlite"
+    HISTORY_COMPRESSION_THRESHOLD: int = 12
 
     # Search settings
     SERPAPI_KEY: str
