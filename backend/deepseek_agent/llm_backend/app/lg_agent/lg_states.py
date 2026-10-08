@@ -72,3 +72,5 @@ class AgentState(InputState):
     question: str = field(default_factory=str) 
     answer: str = field(default_factory=str)  
     hallucination: GradeHallucinations = field(default_factory=lambda: GradeHallucinations(binary_score="0"))
+    iteration: int = field(default=0)
+    """ReAct 回环刹车计数：每进一次 agent 节点 +1，超 max_iterations 强制收尾。"""
