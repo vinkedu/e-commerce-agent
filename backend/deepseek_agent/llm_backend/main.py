@@ -24,9 +24,15 @@ from app.services.indexing_service import IndexingService
 import sys
 from app.lg_agent.lg_states import AgentState, InputState
 from app.lg_agent.utils import new_uuid
-from app.lg_agent.lg_builder import graph
+from app.lg_agent.graph_factory import build_graph
+from app.lg_agent.sse_filter import filter_stream_chunk
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from langgraph.types import Command
+from contextlib import asynccontextmanager
 import json
+
+# 回环图在 lifespan 内构建（挂 AsyncSqliteSaver，整个应用生命周期持有连接）
+graph = None
 
 
 # 配置上传目录 - RAG 功能的
@@ -37,8 +43,17 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 # 之后，便可以在当前文件中直接使用 logger.info()、logger.error() 等方法来记录日志，而不需要进行其他操作。
 logger = get_logger(service="main")
 
+# 应用生命周期：构建 LangGraph 图并挂持久化 checkpointer
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global graph
+    async with AsyncSqliteSaver.from_conn_string(settings.SQLITE_CHECKPOINT_PATH) as saver:
+        graph = build_graph(checkpointer=saver)
+        logger.info(f"LangGraph 构建完成 mode={settings.LG_AGENT_MODE}")
+        yield
+
 # 创建 FastAPI 应用实例
-app = FastAPI(title="AssistGen REST API")
+app = FastAPI(title="AssistGen REST API", lifespan=lifespan)
 
 # 添加日志中间件， 使用 LoggingMiddleware 来统一处理日志记录，从而替代 FastAPI 的原生打印日志。
 app.add_middleware(LoggingMiddleware)
@@ -328,7 +343,7 @@ async def langgraph_query(
         try:
             # 检查是否有现有的会话状态
             if thread_id:
-                state_history = graph.get_state(thread_config)
+                state_history = await graph.aget_state(thread_config)
                 if state_history:
                     logger.info(f"Found existing conversation state for thread_id: {thread_id}")
         except Exception as e:
@@ -344,20 +359,14 @@ async def langgraph_query(
                     stream_mode="messages", 
                     config=thread_config
                 ):
-                    # 只处理最终展示给用户的内容，跳过中间工具调用和内部状态
-                    if c.content and "research_plan" not in metadata.get("tags", []) and not c.additional_kwargs.get("tool_calls"):
-                        # 关键修改：使用json.dumps处理content，确保特殊字符如换行符被正确处理
-                        content_json = json.dumps(c.content, ensure_ascii=False)
-                        yield f"data: {content_json}\n\n"
-                        
-                    # 工具调用单独处理，不发送给前端
-                    elif c.additional_kwargs.get("tool_calls"):
-                        tool_data = c.additional_kwargs.get("tool_calls")[0]["function"].get("arguments")
-                        logger.debug(f"Tool call: {tool_data}")
-                        
-                # 处理中断情况
-                state = graph.get_state(thread_config)
-                if len(state) > 0 and len(state[-1]) > 0:
+                    # 只放行最终作答文本；中间 tool_call/工具结果噪音全部吃掉（SSE 兼容红线）
+                    text = filter_stream_chunk(c, metadata)
+                    if text is not None:
+                        yield f"data: {json.dumps(text, ensure_ascii=False)}\n\n"
+
+                # 处理中断情况（AsyncSqliteSaver 需异步取状态）
+                state = await graph.aget_state(thread_config)
+                if state and len(state) > 0 and len(state[-1]) > 0:
                     if len(state[-1][0].interrupts) > 0:
                         interrupt_json = json.dumps({"interruption": True, "conversation_id": thread_id})
                         yield f"data: {interrupt_json}\n\n"
@@ -373,24 +382,18 @@ async def langgraph_query(
                     stream_mode="messages", 
                     config=thread_config
                 ):
-                    # 只处理最终展示给用户的内容，跳过中间工具调用和内部状态
-                    if c.content and "research_plan" not in metadata.get("tags", []) and not c.additional_kwargs.get("tool_calls"):
-                        # 关键修改：使用json.dumps处理content，确保特殊字符如换行符被正确处理
-                        content_json = json.dumps(c.content, ensure_ascii=False)
-                        yield f"data: {content_json}\n\n"
-                        
-                    # 工具调用单独处理，不发送给前端
-                    elif c.additional_kwargs.get("tool_calls"):
-                        tool_data = c.additional_kwargs.get("tool_calls")[0]["function"].get("arguments")
-                        logger.debug(f"Tool call: {tool_data}")
-                        
-                # 处理中断情况
-                state = graph.get_state(thread_config)
-                if len(state) > 0 and len(state[-1]) > 0:
+                    # 只放行最终作答文本；中间 tool_call/工具结果噪音全部吃掉（SSE 兼容红线）
+                    text = filter_stream_chunk(c, metadata)
+                    if text is not None:
+                        yield f"data: {json.dumps(text, ensure_ascii=False)}\n\n"
+
+                # 处理中断情况（AsyncSqliteSaver 需异步取状态）
+                state = await graph.aget_state(thread_config)
+                if state and len(state) > 0 and len(state[-1]) > 0:
                     if len(state[-1][0].interrupts) > 0:
                         interrupt_json = json.dumps({"interruption": True, "conversation_id": thread_id})
                         yield f"data: {interrupt_json}\n\n"
-        
+
         response = StreamingResponse(
             process_stream(),
             media_type="text/event-stream"
@@ -417,16 +420,10 @@ async def langgraph_resume(request: LangGraphResumeRequest):
         # 流式处理恢复
         async def process_resume():
             async for c, metadata in graph.astream(Command(resume=request.query), stream_mode="messages", config=thread_config):
-                # 只处理最终展示给用户的内容
-                if c.content and not c.additional_kwargs.get("tool_calls"):
-                    # 同样使用json.dumps处理内容
-                    content_json = json.dumps(c.content, ensure_ascii=False)
-                    yield f"data: {content_json}\n\n"
-                
-                # 工具调用单独处理，不发送给前端
-                elif c.additional_kwargs.get("tool_calls"):
-                    tool_data = c.additional_kwargs.get("tool_calls")[0]["function"].get("arguments")
-                    logger.debug(f"Tool call: {tool_data}")
+                # 只放行最终作答文本；中间噪音吃掉（SSE 兼容红线）
+                text = filter_stream_chunk(c, metadata)
+                if text is not None:
+                    yield f"data: {json.dumps(text, ensure_ascii=False)}\n\n"
         
         return StreamingResponse(
             process_resume(),
