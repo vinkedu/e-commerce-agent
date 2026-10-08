@@ -1,0 +1,31 @@
+backend/deepseek_agent/llm_backend/tests/test_sse_contract.py
+  s_32ee097ba0c6dd::t_a7adb914af62b2 1-20
+backend/deepseek_agent/llm_backend/app/lg_agent/sse_filter.py
+  s_32ee097ba0c6dd::t_6d9acadb50c6c4 1-20
+backend/deepseek_agent/llm_backend/main.py
+  s_32ee097ba0c6dd::t_e9ff82b2568a44 346
+  s_32ee097ba0c6dd::t_c6e5d9bd8df1c2 46-54,56
+  s_32ee097ba0c6dd::t_e048f4464e5388 385-392,396
+  s_32ee097ba0c6dd::t_a2ad02b0250836 27-29,31,34-35
+  s_32ee097ba0c6dd::t_6c4a2036790b62 362-369
+  s_32ee097ba0c6dd::t_25076ce09a2274 423-426
+  s_32ee097ba0c6dd::t_991338bcc676ad 36
+backend/deepseek_agent/llm_backend/pytest.ini
+  s_32ee097ba0c6dd::t_0e7d224d6c39fc 4-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "45fc7ecd99b40dc1654cb3d4927ec78507fdd4a0",
+  "prompts": {},
+  "sessions": {
+    "s_32ee097ba0c6dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf6b6262-3154-4ce0-a15a-c4f22faffdc0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "kaiwen_du <kaiwen_du@intsig.net>"
+    }
+  }
+}
