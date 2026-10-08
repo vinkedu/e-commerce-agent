@@ -87,3 +87,37 @@ predefined_query = StructuredTool.from_function(
     description="高频固定查询(产品/客户/订单/供应商/类别/评论/销售分析/智能家居)的确定性快路径",
     args_schema=PredefinedArgs,
 )
+
+
+# ---- search_knowledge_base (GraphRAG) ----
+try:  # pragma: no cover
+    from app.lg_agent.kg_sub_graph.agentic_rag_agents.components.customer_tools.node import (
+        create_graphrag_query_node,
+    )
+except Exception as _e:  # noqa: BLE001
+    logger.warning(f"create_graphrag_query_node 延迟不可用(缺重依赖): {_e}")
+    create_graphrag_query_node = None
+
+
+class KnowledgeArgs(BaseModel):
+    task: str = Field(..., description="关于产品故障、售后、保修、维修、退换货、评价等非结构化问题")
+
+
+async def _search_knowledge_base(task: str) -> str:
+    try:
+        node = create_graphrag_query_node()
+        result = await node({"task": task})
+        cyphers = result.get("cyphers") or []
+        rec = getattr(cyphers[0], "records", {}) if cyphers else {}
+        return truncate_result(str(rec.get("result", "无结果")))
+    except Exception as e:
+        logger.error(f"search_knowledge_base 失败: {e}")
+        return f"工具出错: 知识库检索失败({e})"
+
+
+search_knowledge_base = StructuredTool.from_function(
+    coroutine=_search_knowledge_base,
+    name="search_knowledge_base",
+    description="如果用户问的是产品故障、售后、保修、维修、退换货、评价等问题，则使用这个工具检索知识库",
+    args_schema=KnowledgeArgs,
+)
