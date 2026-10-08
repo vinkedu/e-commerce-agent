@@ -1,0 +1,49 @@
+backend/deepseek_agent/llm_backend/tests/test_sse_contract.py
+  s_32ee097ba0c6dd::t_6079aeecc0e073 21-26
+backend/deepseek_agent/llm_backend/app/lg_agent/middleware/history.py
+  s_32ee097ba0c6dd::t_5d38e15bdf3cd4 19-25
+  s_32ee097ba0c6dd::t_451d1f99c61cd5 1
+backend/deepseek_agent/llm_backend/tests/test_agent_loop.py
+  s_32ee097ba0c6dd::t_587bb2078aebbf 26-34
+  s_32ee097ba0c6dd::t_6f5d8e46a43feb 35-49
+backend/deepseek_agent/llm_backend/app/lg_agent/tools/kg_tools.py
+  s_32ee097ba0c6dd::t_9611c3c7e7d219 120-121
+  s_32ee097ba0c6dd::t_a103b6bfcaa942 24-32,37
+  s_32ee097ba0c6dd::t_9d2cc6edaa311b 87
+backend/deepseek_agent/llm_backend/app/lg_agent/agent_loop.py
+  s_32ee097ba0c6dd::t_da3dacd9954462 62-66
+  s_32ee097ba0c6dd::t_35066dedc262b0 28-32
+backend/deepseek_agent/llm_backend/tests/test_middleware_history.py
+  s_32ee097ba0c6dd::t_0e9c5888da19ee 1
+  s_32ee097ba0c6dd::t_3016f834164e09 19-45
+backend/deepseek_agent/llm_backend/tests/test_web_tool.py
+  s_32ee097ba0c6dd::t_061bbed1c8d29e 15-29
+backend/deepseek_agent/llm_backend/tests/test_multiturn.py
+  s_32ee097ba0c6dd::t_70c3c6a1493dd1 1-21
+backend/deepseek_agent/llm_backend/app/lg_agent/sse_filter.py
+  s_32ee097ba0c6dd::t_be5fce8a168dd5 18-21
+backend/deepseek_agent/llm_backend/tests/test_kg_tool_predefined.py
+  s_32ee097ba0c6dd::t_4630f43dab4569 20-30
+backend/deepseek_agent/llm_backend/app/lg_agent/tools/web_tools.py
+  s_32ee097ba0c6dd::t_d84c6077dcb640 1
+  s_32ee097ba0c6dd::t_c2655e2cd6f464 22-24
+backend/deepseek_agent/llm_backend/main.py
+  s_32ee097ba0c6dd::t_2a65bc520ee2fb 353-354,359-360
+  s_32ee097ba0c6dd::t_6d808fdd427f02 29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b428cfbabc86fc63f7e4000259dc7d70f65ba8cc",
+  "prompts": {},
+  "sessions": {
+    "s_32ee097ba0c6dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf6b6262-3154-4ce0-a15a-c4f22faffdc0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "kaiwen_du <kaiwen_du@intsig.net>"
+    }
+  }
+}
