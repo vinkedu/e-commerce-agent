@@ -1,0 +1,23 @@
+backend/deepseek_agent/llm_backend/app/lg_agent/middleware/history.py
+  s_32ee097ba0c6dd::t_ad3c4b2235c1e8 1-28
+backend/deepseek_agent/llm_backend/app/core/config.py
+  s_32ee097ba0c6dd::t_fa0cb80b0a206c 38
+backend/deepseek_agent/llm_backend/tests/test_middleware_history.py
+  s_32ee097ba0c6dd::t_8f93ca0de437c8 1-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "70dff72c34dfffbb7d9c921e5c968ba25d96c45f",
+  "prompts": {},
+  "sessions": {
+    "s_32ee097ba0c6dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf6b6262-3154-4ce0-a15a-c4f22faffdc0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "kaiwen_du <kaiwen_du@intsig.net>"
+    }
+  }
+}
