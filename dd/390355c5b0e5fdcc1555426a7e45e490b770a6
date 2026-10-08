@@ -1,0 +1,21 @@
+backend/deepseek_agent/llm_backend/tests/test_kg_tool_predefined.py
+  s_32ee097ba0c6dd::t_86da8aef0971b9 1-19
+backend/deepseek_agent/llm_backend/app/lg_agent/tools/kg_tools.py
+  s_32ee097ba0c6dd::t_2942d4aa62ba34 47-89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "dd390355c5b0e5fdcc1555426a7e45e490b770a6",
+  "prompts": {},
+  "sessions": {
+    "s_32ee097ba0c6dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf6b6262-3154-4ce0-a15a-c4f22faffdc0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "kaiwen_du <kaiwen_du@intsig.net>"
+    }
+  }
+}
