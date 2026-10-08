@@ -44,3 +44,46 @@ query_product_graph = StructuredTool.from_function(
     description="如果用户问的是关于产品价格、库存、规格、订单、供应商等结构化信息，则使用这个工具生成 Cypher 查询",
     args_schema=CypherArgs,
 )
+
+
+# ---- predefined_query ----
+try:  # pragma: no cover
+    from app.lg_agent.kg_sub_graph.kg_neo4j_conn import get_neo4j_graph
+    from app.lg_agent.kg_sub_graph.agentic_rag_agents.components.predefined_cypher.node import (
+        create_predefined_cypher_node,
+    )
+    from app.lg_agent.kg_sub_graph.agentic_rag_agents.components.predefined_cypher.cypher_dict import (
+        predefined_cypher_dict,
+    )
+except Exception as _e:  # noqa: BLE001
+    logger.warning(f"predefined_query 依赖延迟不可用(缺重依赖): {_e}")
+    get_neo4j_graph = None
+    create_predefined_cypher_node = None
+    predefined_cypher_dict = {}
+
+
+class PredefinedArgs(BaseModel):
+    query_name: str = Field(..., description="预置查询名，如 product_by_name/smart_lighting 等")
+    query: str = Field(..., description="与 query_name 相同的预置查询键")
+    parameters: dict = Field(default_factory=dict, description="查询参数，如 {'product_name': '台灯'}")
+
+
+async def _predefined_query(query_name: str, query: str, parameters: dict) -> str:
+    try:
+        graph = get_neo4j_graph()
+        node = create_predefined_cypher_node(graph=graph, predefined_cypher_dict=predefined_cypher_dict)
+        result = await node({"task": query_name, "query_name": query_name,
+                             "query_parameters": {"query": query, "parameters": parameters}, "steps": []})
+        cyphers = result.get("cyphers") or []
+        return truncate_result(str(getattr(cyphers[0], "records", "无结果")) if cyphers else "无结果")
+    except Exception as e:
+        logger.error(f"predefined_query 失败: {e}")
+        return f"工具出错: 预置查询失败({e})"
+
+
+predefined_query = StructuredTool.from_function(
+    coroutine=_predefined_query,
+    name="predefined_query",
+    description="高频固定查询(产品/客户/订单/供应商/类别/评论/销售分析/智能家居)的确定性快路径",
+    args_schema=PredefinedArgs,
+)
