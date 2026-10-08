@@ -1,0 +1,21 @@
+.gitignore
+  s_32ee097ba0c6dd::t_b6205fa704cc96 64-67
+backend/deepseek_agent/llm_backend/app/core/config.py
+  s_32ee097ba0c6dd::t_2df07afdde7841 36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "390c60de604ac706553a29fc1f09e492ecdf644a",
+  "prompts": {},
+  "sessions": {
+    "s_32ee097ba0c6dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf6b6262-3154-4ce0-a15a-c4f22faffdc0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "kaiwen_du <kaiwen_du@intsig.net>"
+    }
+  }
+}
