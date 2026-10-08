@@ -459,41 +459,6 @@ async def create_research_plan(
     response = await multi_tool_workflow.ainvoke(input_state)
     return {"messages": [AIMessage(content=response["answer"])]}
 
-async def check_hallucinations(
-    state: AgentState, *, config: RunnableConfig
-) -> dict[str, Any]:
-    """Analyze the user's query and checks if the response is supported by the set of facts based on the document retrieved,
-    providing a binary score result.
-
-    This function uses a language model to analyze the user's query and gives a binary score result.
-
-    Args:
-        state (AgentState): The current state of the agent, including conversation history.
-        config (RunnableConfig): Configuration with the model used for query analysis.
-
-    Returns:
-        dict[str, Router]: A dictionary containing the 'router' key with the classification result (classification type and logic).
-    """
-    if settings.AGENT_SERVICE == ServiceType.DEEPSEEK:
-        model = ChatDeepSeek(api_key=settings.DEEPSEEK_API_KEY, model_name=settings.DEEPSEEK_MODEL, temperature=0.7, tags=["hallucinations"])
-    else:
-        model = ChatOllama(model=settings.OLLAMA_AGENT_MODEL, base_url=settings.OLLAMA_BASE_URL, temperature=0.7, tags=["hallucinations"])
-    
-    system_prompt = CHECK_HALLUCINATIONS.format(
-        documents=state.documents,
-        generation=state.messages[-1]
-    )
-
-    messages = [
-        {"role": "system", "content": system_prompt}
-    ] + state.messages
-
-    logger.info("---CHECK HALLUCINATIONS---")
-    
-    response = cast(GradeHallucinations, await model.with_structured_output(GradeHallucinations).ainvoke(messages))
-    
-    return {"hallucination": response} 
-
 
 # 定义持久化存储，也可以使用SQLiteSaver()、PostgresSaver()等
 # LangGraph官方地址：https://langchain-ai.github.io/langgraph/how-tos/persistence/

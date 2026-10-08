@@ -128,19 +128,13 @@ def create_planner_node(
         """
         Break user query into chunks, if appropriate.
         """
-        print("我现在要开始任务分解了！！！")
         if not ignore_node:
-            print("我进入的是实际执行！！！！")
             planner_output: PlannerOutput = await planner_chain.ainvoke(
                 {"question": state.get("question", "")}
             )
-            print(f"planner_output: {planner_output}")
         else:
-            print("我进入的是 空列表")
             planner_output = PlannerOutput(tasks=[])
-            print(f"planner_output: {planner_output}")
-        print("我执行完了！！！")
-    
+
         return {
             "next_action": next_action,
             "tasks": planner_output.tasks

@@ -68,8 +68,5 @@ class microsoft_graphrag_query(BaseModel):
     query: str = Field(..., description="query the graph must include the question")
     
 
-class real_time_network_query(BaseModel):
-    """如果用户问的问题是关于一些实时的产品有效信息需要联网检索的话，则使用这个工具"""
-    query: str = Field(..., description="query the network must include the question")
 
 
