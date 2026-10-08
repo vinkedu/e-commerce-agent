@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     AGENT_SERVICE: ServiceType = ServiceType.DEEPSEEK
 
     # Agent loop settings
-    LG_AGENT_MODE: str = "legacy"   # loop | legacy
+    LG_AGENT_MODE: str = "loop"   # loop | legacy
     SQLITE_CHECKPOINT_PATH: str = "checkpoints.sqlite"
     HISTORY_COMPRESSION_THRESHOLD: int = 12
 

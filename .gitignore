@@ -61,3 +61,7 @@ Thumbs.db
 
 # Superpowers scratch
 .superpowers/
+
+# LangGraph sqlite checkpoint
+*.sqlite
+checkpoints.sqlite
