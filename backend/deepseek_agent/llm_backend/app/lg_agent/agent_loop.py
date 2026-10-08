@@ -25,7 +25,11 @@ async def agent_node(state: AgentState, *, config: RunnableConfig):
     model = get_agent_model(tags=["agent"])
     over_limit = state.iteration >= MAX_ITERATIONS
     runnable = model if over_limit else model.bind_tools(get_tools())
-    ai = await runnable.ainvoke(messages)
+    try:
+        ai = await runnable.ainvoke(messages)
+    except Exception as e:
+        logger.error(f"agent 模型调用失败，降级作答: {e}")
+        ai = AIMessage(content="抱歉，刚才处理出了点问题，请您换个说法再问一次～")
     return {"messages": [ai], "iteration": state.iteration + 1}
 
 
@@ -55,14 +59,12 @@ async def tools_node(state: AgentState):
     return {"messages": out}
 
 
-def route_entry(state: AgentState) -> Literal["agent", "image", "file"]:
-    # image/file 由 main.py 预置到 state.router；默认走 agent 回环
-    router = getattr(state, "router", None)
-    rtype = router.get("type") if isinstance(router, dict) else None
-    if rtype == "image":
+def route_entry(state: AgentState, config: RunnableConfig = None) -> Literal["agent", "image", "file"]:
+    # 图片经 config.configurable.image_path 传入（与 create_image_query 读取方式一致）；
+    # 其余(含 general/additional/graphrag)全部走 agent 回环。file 暂无触发源(保留 stub 节点)。
+    cfg = (config or {}).get("configurable", {}) if config else {}
+    if cfg.get("image_path"):
         return "image"
-    if rtype == "file":
-        return "file"
     return "agent"
 
 

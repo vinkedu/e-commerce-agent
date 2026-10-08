@@ -18,3 +18,9 @@ def test_tool_message_suppressed():
 
 def test_empty_content_suppressed():
     assert filter_stream_chunk(AIMessage(content=""), {"tags": []}) is None
+
+
+def test_compress_tagged_chunk_suppressed():
+    # 历史压缩用的内部 LLM(tag=compress)输出不得当作答案泄漏给前端
+    msg = AIMessage(content="[历史摘要] 用户关注智能台灯")
+    assert filter_stream_chunk(msg, {"tags": ["compress"]}) is None

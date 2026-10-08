@@ -21,11 +21,20 @@ class CypherArgs(BaseModel):
     task: str = Field(..., description="要用 Cypher 回答的任务，如产品价格、库存、规格、订单、供应商等结构化查询")
 
 
+def _records_of(item, default=None):
+    """兼容两种节点返回：pydantic BaseModel(用属性) 与 TypedDict/dict(用下标)。"""
+    if item is None:
+        return default
+    if isinstance(item, dict):
+        return item.get("records", default)
+    return getattr(item, "records", default)
+
+
 def _records_text(result: dict) -> str:
     cyphers = result.get("cyphers") or []
     if not cyphers:
         return "无结果"
-    return str(getattr(cyphers[0], "records", {}))
+    return str(_records_of(cyphers[0], {}))
 
 
 async def _query_product_graph(task: str) -> str:
@@ -75,7 +84,7 @@ async def _predefined_query(query_name: str, query: str, parameters: dict) -> st
         result = await node({"task": query_name, "query_name": query_name,
                              "query_parameters": {"query": query, "parameters": parameters}, "steps": []})
         cyphers = result.get("cyphers") or []
-        return truncate_result(str(getattr(cyphers[0], "records", "无结果")) if cyphers else "无结果")
+        return truncate_result(str(_records_of(cyphers[0], "无结果")) if cyphers else "无结果")
     except Exception as e:
         logger.error(f"predefined_query 失败: {e}")
         return f"工具出错: 预置查询失败({e})"
@@ -108,7 +117,8 @@ async def _search_knowledge_base(task: str) -> str:
         node = create_graphrag_query_node()
         result = await node({"task": task})
         cyphers = result.get("cyphers") or []
-        rec = getattr(cyphers[0], "records", {}) if cyphers else {}
+        rec = _records_of(cyphers[0], {}) if cyphers else {}
+        rec = rec if isinstance(rec, dict) else {}
         return truncate_result(str(rec.get("result", "无结果")))
     except Exception as e:
         logger.error(f"search_knowledge_base 失败: {e}")

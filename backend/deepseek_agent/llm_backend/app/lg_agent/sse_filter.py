@@ -15,6 +15,9 @@ def filter_stream_chunk(chunk, metadata) -> str | None:
     content = getattr(chunk, "content", None)
     if not content:
         return None
-    if "research_plan" in (metadata or {}).get("tags", []):
+    # 非答案的内部 LLM 调用必须打这些 tag，否则其 token 会被当答案泄漏给前端。
+    # research_plan: legacy 子图内部；compress: 历史压缩中间件。
+    suppressed_tags = {"research_plan", "compress"}
+    if suppressed_tags & set((metadata or {}).get("tags", []) or []):
         return None
     return content

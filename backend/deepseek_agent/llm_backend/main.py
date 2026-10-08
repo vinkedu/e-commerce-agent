@@ -26,6 +26,7 @@ from app.lg_agent.lg_states import AgentState, InputState
 from app.lg_agent.utils import new_uuid
 from app.lg_agent.graph_factory import build_graph
 from app.lg_agent.sse_filter import filter_stream_chunk
+from langchain_core.messages import HumanMessage
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from langgraph.types import Command
 from contextlib import asynccontextmanager
@@ -349,14 +350,14 @@ async def langgraph_query(
         except Exception as e:
             logger.warning(f"Error retrieving state: {e}. Starting with fresh state.")
         
-        # 准备输入状态 - 如果是现有会话，直接传入查询文本
+        # 准备输入状态 - 如果是现有会话，追加新一轮用户消息（loop 图无 interrupt，
+        # 不能用 Command(resume=)——那会丢弃新问题；靠 add_messages reducer 追加 + checkpointer 携带历史）
         if state_history and len(state_history) > 0 and len(state_history[-1]) > 0:
             logger.info("Using existing conversation state")
-            # 如果有现有会话，使用resume命令继续对话
             async def process_stream():
                 async for c, metadata in graph.astream(
-                    Command(resume=query), 
-                    stream_mode="messages", 
+                    {"messages": [HumanMessage(content=query)]},
+                    stream_mode="messages",
                     config=thread_config
                 ):
                     # 只放行最终作答文本；中间 tool_call/工具结果噪音全部吃掉（SSE 兼容红线）

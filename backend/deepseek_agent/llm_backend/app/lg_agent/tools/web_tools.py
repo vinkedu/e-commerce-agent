@@ -1,3 +1,4 @@
+import asyncio
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field
 from app.lg_agent.tools.result import truncate_result
@@ -18,7 +19,9 @@ class WebSearchArgs(BaseModel):
 
 async def _web_search(query: str) -> str:
     try:
-        raw = _raw_search(query)
+        # _raw_search 内部是同步阻塞 requests.get；放线程池执行，避免卡死事件循环
+        loop = asyncio.get_running_loop()
+        raw = await loop.run_in_executor(None, _raw_search, query)
         return truncate_result(str(raw))
     except Exception as e:
         logger.error(f"web_search 失败: {e}")
